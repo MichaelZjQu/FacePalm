@@ -87,4 +87,4 @@ def get_ai_response():
     return jsonify({"searchterm": response_text, "message": f"Detected: {emotion}.\n" + message.text.strip()})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
