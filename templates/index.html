@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #aiResponse {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Stream</h1>
+        <div>
+            <img id="videoFeed" src="{{url_for('video')}}" width="50%" alt="Stream">
+        </div>
+        <button id="freezeButton">Freeze Frame</button>
+        <div id="aiResponse"></div>
+    </div>
+
+    <script>
+        const freezeButton = document.getElementById('freezeButton');
+        const aiResponse = document.getElementById('aiResponse');
+        let isFrozen = false;
+
+        // Add cleanup on page unload
+        window.addEventListener('beforeunload', async () => {
+            await fetch('/cleanup', {
+                method: 'POST',
+                keepalive: true // Ensures the request completes even if page is closing
+            });
+        });
+
+        freezeButton.addEventListener('click', async function() {
+            const response = await fetch('/toggle_freeze');
+            const data = await response.json();
+            isFrozen = data.frozen;
+            freezeButton.textContent = isFrozen ? 'Resume Stream' : 'Freeze Frame';
+            
+            if (data.ai_response) {
+                aiResponse.textContent = data.ai_response;
+                aiResponse.style.display = 'block';
+            } else {
+                aiResponse.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
