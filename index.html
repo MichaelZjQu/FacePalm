@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Emotion Snap</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div id="loginPage">
+        <div id="modeToggle">
+            <button id="lightModeBtn" onclick="setLightMode()" class="active">Light</button>
+            <button id="darkModeBtn" onclick="setDarkMode()">Dark</button>
+        </div>
+        <input type="text" id="userName" placeholder="Your Name"><br>
+        <input type="text" id="favoriteThing" placeholder="Favorite Thing"><br>
+        <button id="loginBtn" onclick="startApp()">Begin</button>
+    </div>
+
+    <div id="mainPage" class="hidden">
+        <div id="topBar">
+            <span id="cameraIcon">[◉"]</span>
+            <span id="messageBox">Click to Analyze</span>
+            <div id="buttonContainer">
+                <button id="actionBtn" onclick="handleAction()">Go</button>
+            </div>
+        </div>
+        <div id="placeholder" class="hidden"></div>
+        <iframe id="searchFrame" class="hidden" frameborder="0"></iframe>
+    </div>
+
+    <script>
+        let userName = '';
+        let favoriteThing = '';
+        let isAnalyzed = false;
+
+        window.onload = function() {
+            document.getElementById('loginPage').style.display = 'flex';
+            setLightMode(); // Default to light mode
+        };
+
+        function setLightMode() {
+            document.body.classList.remove('dark-mode');
+            document.getElementById('lightModeBtn').classList.add('active');
+            document.getElementById('darkModeBtn').classList.remove('active');
+        }
+
+        function setDarkMode() {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkModeBtn').classList.add('active');
+            document.getElementById('lightModeBtn').classList.remove('active');
+        }
+
+        function startApp() {
+            userName = document.getElementById('userName').value.trim();
+            favoriteThing = document.getElementById('favoriteThing').value.trim();
+            if (userName && favoriteThing) {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('mainPage').style.display = 'flex';
+                document.getElementById('placeholder').classList.remove('hidden');
+            } else {
+                alert('Please enter both your name and favorite thing.');
+            }
+        }
+
+        function handleAction() {
+            if (isAnalyzed) {
+                resetPage();
+            } else {
+                startCountdown();
+            }
+        }
+
+        function startCountdown() {
+            const placeholder = document.getElementById('placeholder');
+            let count = 3;
+            placeholder.textContent = count;
+            placeholder.classList.add('countdown');
+
+            const countdownInterval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    placeholder.textContent = count;
+                } else {
+                    clearInterval(countdownInterval);
+                    placeholder.textContent = '';
+                    analyzePhoto();
+                }
+            }, 1000); // 1 second per count
+        }
+
+        function analyzePhoto() {
+            const placeholder = document.getElementById('placeholder');
+            const actionBtn = document.getElementById('actionBtn');
+
+            // Slow flash animation
+            placeholder.classList.add('flash');
+            setTimeout(() => {
+                placeholder.classList.remove('flash');
+                placeholder.classList.add('shrink-to-camera');
+            }, 600); // Flash duration (slower)
+
+            setTimeout(() => {
+                const emotion = 'happy'; // Placeholder for photo input
+                const searchQuery = encodeURIComponent(`${emotion} ${favoriteThing}`);
+                const searchUrl = `https://www.google.com/search?q=${searchQuery}&igu=1`;
+                const searchFrame = document.getElementById('searchFrame');
+
+                placeholder.classList.add('hidden');
+                searchFrame.src = searchUrl;
+                searchFrame.classList.remove('hidden');
+                document.getElementById('messageBox').textContent = 'Analyzed: Happy';
+                actionBtn.textContent = 'Reset';
+                isAnalyzed = true;
+            }, 1600); // Total animation duration (flash 0.6s + shrink 1s)
+        }
+
+        function resetPage() {
+            userName = '';
+            favoriteThing = '';
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('userName').value = '';
+            document.getElementById('favoriteThing').value = '';
+            document.getElementById('placeholder').classList.remove('shrink-to-camera');
+            document.getElementById('placeholder').classList.remove('hidden');
+            document.getElementById('searchFrame').classList.add('hidden');
+            document.getElementById('messageBox').textContent = 'Click to Analyze';
+            document.getElementById('actionBtn').textContent = 'Go';
+            isAnalyzed = false;
+        }
+    </script>
+</body>
+</html>
