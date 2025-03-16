@@ -5,37 +5,46 @@
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <div id="loginPage">
-        <h1>Preferences Survey</h1>
-        <form onsubmit="startApp(event)">
-            <label>What is your favourite school subject?</label><br>
-            <input type="text" name="favSubject" required><br><br>
+    <div id="homePage">
+        <div class="welcome-container">
+            <h1>facepalm</h1>
+            <p>you don't want to use this</p>
+            <button id="startButton" onclick="showPreferences()">Create Profile</button>
+        </div>
+    </div>
+    <div id = "tempbg">
+        <div id="loginPage" class="hidden">
+            <h1>preferences</h1>
+            <form onsubmit="startApp(event)">
+                <label>what is your favourite school subject?</label>
+                <input type="text" name="favSubject" required>
 
-            <label>What is your least favourite school subject?</label><br>
-            <input type="text" name="notFavSubject" required><br><br>
+                <label>what is your least favourite school subject?</label>
+                <input type="text" name="notFavSubject" required>
 
-            <label>What do you do for fun?</label><br>
-            <input type="text" name="funThing" required><br><br>
+                <label>what do you do for fun?</label>
+                <input type="text" name="funThing" required>
 
-            <label>What do you do in your free time?</label><br>
-            <input type="text" name="freeTime" required><br><br>
+                <label>what do you do in your free time?</label>
+                <input type="text" name="freeTime" required>
 
-            <label>What frustrates you the most?</label><br>
-            <input type="text" name="frustration" required><br><br>
-            
-            <label>What scares you the most?</label><br>
-            <input type="text" name="fear" required><br><br>
+                <label>what frustrates you the most?</label>
+                <input type="text" name="frustration" required>
+                
+                <label>what scares you the most?</label>
+                <input type="text" name="fear" required>
 
-            <button type="submit">Submit</button>
-        </form>
+                <button type="submit">submit</button>
+            </form>
+        </div>
     </div>
 
     <div id="mainPage" class="hidden">
         <div id="topBar">
-            <span id="cameraIcon">FacePalm</span>
-            <span id="messageBox">Click to Analyze</span>
+            <span id="cameraIcon">facepalm</span>
+            <span id="messageBox">press go to search!</span>
             <div id="buttonContainer">
-                <button id="actionBtn" onclick="handleAction()">Go</button>
+                <button id="actionBtn" onclick="handleAction()">go</button>
             </div>
         </div>
         <div id="videoContainer">
@@ -49,7 +58,7 @@
         var userResponses = {};
 
         window.onload = function() {
-            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('homePage').style.display = 'flex';
             setLightMode(); // Default to light mode
         };
 
@@ -63,6 +72,32 @@
             document.body.classList.add('dark-mode');
             document.getElementById('darkModeBtn').classList.add('active');
             document.getElementById('lightModeBtn').classList.remove('active');
+        }
+
+        function showPreferences() {
+            const homePage = document.getElementById('homePage');
+            const loginPage = document.getElementById('loginPage');
+            const welcomeContainer = document.querySelector('.welcome-container');
+
+            // Fade out welcome container first
+            welcomeContainer.style.opacity = '0';
+            welcomeContainer.style.transform = 'translateY(20px)';
+
+            // After welcome container fades
+            setTimeout(() => {
+                homePage.style.display = 'none';
+                
+                // Show and animate login page
+                loginPage.classList.remove('hidden');
+                loginPage.style.display = 'flex';
+                
+                // Force browser reflow
+                loginPage.offsetHeight;
+                
+                // Trigger animation
+                loginPage.style.opacity = '1';
+                loginPage.style.transform = 'translate(-50%, -50%)';
+            }, 300);
         }
 
         function startApp(event) {
@@ -165,11 +200,15 @@
                         // Create search URL with actual emotion
                         var searchterm;
                         var searchUrl = "";
+                        var message = "";
                         switch(data.emotion){
                             case 'happy':
                             case 'sad':
                             case 'fear':
                             case 'angry':
+                            case 'surprise':
+                            case 'neutral':
+                            case 'disgust':
                                 // Get AI response for emotions
                                 fetch('/get_ai_response', {
                                     method: 'POST',
@@ -184,6 +223,7 @@
                                 .then(response => response.json())
                                 .then(aiData => {
                                     searchUrl = aiData.searchterm;
+                                    message = aiData.message;
                                     continueWithSearch();
                                 });
                                 break;
@@ -198,7 +238,7 @@
                                 videoFeed.classList.add('hidden');
                                 searchFrame.src = searchUrl;
                                 searchFrame.classList.remove('hidden');
-                                messageBox.textContent = `Analyzed: ${data.emotion}`;
+                                messageBox.textContent = message;
                                 actionBtn.textContent = 'Reset';
                                 isAnalyzed = true;
                             }, 1600);
@@ -238,8 +278,8 @@
                 videoFeed.src = `${window.location.origin}/video?t=${new Date().getTime()}`;
                 
                 // Reset UI elements
-                messageBox.textContent = 'Click to Analyze';
-                actionBtn.textContent = 'Go';
+                messageBox.textContent = 'press go to search!';
+                actionBtn.textContent = 'go';
                 isAnalyzed = false;
             }).catch(error => {
                 console.error('Error during reset:', error);

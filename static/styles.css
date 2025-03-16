@@ -5,33 +5,58 @@
     box-sizing: border-box;
 }
 
+/* Add these new styles at the top after reset styles */
+
+:root {
+    --primary-color: #4a90e2;
+    --secondary-color: #f39c12;
+    --accent-color: #e74c3c;
+    --background-light: #55f365;
+    --background-dark: #222;
+    --text-light: #333;
+    --text-dark: #fff;
+}
+
 body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background-color: #f5f5f5;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: url('/static/bg.png') no-repeat center center;
+    background-size: cover;
+    font-family: "Comic Sans MS", "Comic Sans", cursive, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-size: 16px;
     margin: 0;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body.dark-mode {
-    background-color: #222;
+    background: linear-gradient(135deg, var(--background-dark) 0%, #111 100%);
     color: #fff;
 }
 
+
 /* Login Page */
 #loginPage {
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     gap: 20px;
-    padding: 40px;
-    background-color: #fff;
-    border-radius: 8px;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.95);
+    max-width: 600px;
+    width: 90%;
+    border-radius: 20px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     margin: auto;
+    animation: slideIn 0.5s ease-out;
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -45%);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 body.dark-mode #loginPage {
@@ -82,16 +107,17 @@ body.dark-mode #modeToggle button:hover {
 
 /* Main Page */
 #mainPage {
-    display: none;
+    display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 100%;
     height: 100vh;
-    overflow-y: auto;
+    width: 100%;
+    overflow: hidden;
+    padding-top: 60px; /* Add padding to account for fixed topBar */
 }
 
 .hidden {
     display: none !important;
+    opacity: 0;
 }
 
 /* Top Bar */
@@ -101,14 +127,14 @@ body.dark-mode #modeToggle button:hover {
     align-items: center;
     width: 100vw;
     padding: 15px 20px;
-    background-color: #fff;
-    border-bottom: 1px solid #ddd;
+    background-color: #5acc65;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
     position: fixed;
     top: 0;
     left: 0;
     z-index: 10;
     transition: background-color 0.3s ease, border-color 0.3s ease;
+    height: 70px; /* Add explicit height */
 }
 
 body.dark-mode #topBar {
@@ -120,6 +146,7 @@ body.dark-mode #topBar {
 #cameraIcon {
     font-size: 24px;
     color: #666;
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
 }
 
 body.dark-mode #cameraIcon {
@@ -131,6 +158,7 @@ body.dark-mode #cameraIcon {
     color: #333;
     flex-grow: 1;
     text-align: center;
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
 }
 
 body.dark-mode #messageBox {
@@ -146,18 +174,20 @@ body.dark-mode #messageBox {
 
 /* Inputs */
 input[type="text"] {
-    width: 250px;
+    width: 100%;
     padding: 12px;
     font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
     background-color: #fff;
     outline: none;
-    transition: border-color 0.2s ease, background-color 0.3s ease;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+    margin-bottom: 10px;
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
 }
 
 input[type="text"]:focus {
-    border-color: #e57373;
+    border-color: var(--primary-color);
 }
 
 body.dark-mode input[type="text"] {
@@ -176,6 +206,7 @@ button {
     color: #fff;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
 }
 
 button:hover {
@@ -211,7 +242,7 @@ body.dark-mode #loginBtn:hover {
     width: 100vw;
     height: calc(100vh - 70px);
     border: none;
-    margin-top: 70px;
+    margin-top: 10px;
     background-color: #fff;
     z-index: 5;
     transition: background-color 0.3s ease;
@@ -245,6 +276,39 @@ body.dark-mode #searchFrame {
     }
 }
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInForm {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -45%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
 .flash {
     animation: flash 0.6s ease-in-out;
 }
@@ -265,16 +329,138 @@ body.dark-mode .countdown {
 #videoFeed {
     width: 50%;
     height: auto;
+    max-height: calc(100vh - 90px); /* Prevent overflow */
     display: block;
     margin: 0 auto;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    object-fit: contain;
 }
 
 #videoContainer {
-    margin-top: 70px;  /* Match topBar height */
-    width: 100%;
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: 0px; /* Remove margin-top */
+    width: 100%;
+}
+
+/* Home Page */
+#homePage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    background: url('/static/bg.png') no-repeat center center;
+    background-size: cover;
+}
+
+.welcome-container {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px 60px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.8s ease-out;
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.dark-mode .welcome-container {
+    background: rgba(51, 51, 51, 0.95);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.welcome-container h1 {
+    color: var(--primary-color);
+    font-size: 3em;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.welcome-container p {
+    color: var(--secondary-color);
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+}
+
+#startButton {
+    background: var(--primary-color);
+    color: white;
+    padding: 15px 40px;
+    font-size: 1.2em;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+}
+
+#startButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+}
+
+/* Update form styles */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    padding: 10px;
+}
+
+label {
+    color: var(--text-light);
+    font-size: 1.1em;
+    margin-bottom: 2px;
+    display: block;
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+}
+
+body.dark-mode label {
+    color: var(--text-dark);
+}
+
+#homePage, #loginPage {
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+br {
+    display: none;
+}
+
+/* Add scrollbar styling */
+#loginPage::-webkit-scrollbar {
+    width: 8px;
+}
+
+#loginPage::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+#loginPage::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+body.dark-mode #loginPage::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Update headings */
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+}
+
+/* Update any specific text elements */
+#messageBox, #cameraIcon, label, .welcome-container p {
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
 }

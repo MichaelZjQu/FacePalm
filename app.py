@@ -65,21 +65,26 @@ def get_ai_response():
     responses = data.get('responses')
     
     prompts = {
-        'happy': f"give me thebase google images url, just the url, for images of {responses['fear']}.",
-        'sad': f"Give me a url, just the url, to a site to learn about {responses['notFavSubject']}. Make sure the site is able to be embedded in a web page.",
-        'fear': f"give me thebase google images url, just the url, for images of {responses['fear']}.",
-        'angry': f"Give me a url, just the url, to a site to learn about {responses['notFavSubject']}. Make sure the site is able to be embedded in a web page.",
+        'happy': f"Give me the base google images url, just the url, for images of 'pictures of {responses['fear']}'.",
+        'sad': f"Give me a url, just the url, to a site to learn about {responses['notFavSubject']}. Make sure the site is able to be embedded in a web page. DONT GIVE MOZILLA, KHAN ACADEMY, or MATHPLAYGROUND",
+        'fear': f"Give me the base google images url, just the url, for images of 'pictures of {responses['fear']}'.",
+        'angry': f"Give me a url, just the url, to a site to learn about {responses['notFavSubject']}. Make sure the site is able to be embedded in a web page. DONT GIVE MOZILLA, KHAN ACADEMY, or MATHPLAYGROUND",
+        'disgust': f"Give me a url, just the url, to a site to learn about {responses['notFavSubject']}. Make sure the site is able to be embedded in a web page. DONT GIVE MOZILLA, KHAN ACADEMY, or MATHPLAYGROUND",
+        'surprise': f"Give me a url, just the url, to a site to learn about {responses['notFavSubject']}. Make sure the site is able to be embedded in a web page. DONT GIVE MOZILLA, KHAN ACADEMY, or MATHPLAYGROUND",
+        'neutral': f"Give me the base google images url, just the url, for images of 'pictures of {responses['fear']}'.",
     }
     
     prompt_text = prompts.get(emotion)
     
     response = prompt(prompt_text)
+    
+    message = prompt(f"Give me on very short sentence of: roast me on how I am feel {emotion}, and use the fact that my favorite subject is {responses['favSubject']}, or my least favorite subject is {responses['notFavSubject']}, or I like to do {responses['funThing']} in my free time, or I am afraid of {responses['fear']}, or I get frustrated when {responses['frustration']}. Only use one of those facts, make it a very short sentence.")
 
     response_text = response.text.strip()
     if(emotion in ['fear', 'happy']):
         response_text += '&igu=1'
     
-    return jsonify({"searchterm": response_text})
+    return jsonify({"searchterm": response_text, "message": f"Detected: {emotion}.\n" + message.text.strip()})
 
 if __name__ == '__main__':
     app.run(debug=True)

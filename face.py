@@ -34,7 +34,10 @@ def cleanup_resources():
 
 def gen_frames():
     global cam, current_emotion, stop_stream
-    stop_stream.clear()  # Reset the stop flag
+    stop_stream.clear()
+    frame_count = 0
+    last_faces = []  # Store last detected face positions
+    last_emotion = None  # Store last detected emotion
     
     try:
         while not stop_stream.is_set():
@@ -47,18 +50,24 @@ def gen_frames():
                 if not ret:
                     print("Failed to read frame")
                     continue
-                    
-                # Process frame with DeepFace
-                result = DeepFace.analyze(img_path=frame, actions=["emotion"], enforce_detection=False)
-                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                faces = cascade.detectMultiScale(gray, 1.1, 4)
-
-                for (x, y, w, h) in faces:
-                    cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 3)
                 
-                emotion = result[0]['dominant_emotion']
-                current_emotion = emotion
-                cv2.putText(frame, emotion, (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 3)
+                frame_count = (frame_count + 1) % 3
+                
+                # Only detect emotion every 3rd frame
+                if frame_count == 0:
+                    result = DeepFace.analyze(img_path=frame, actions=["emotion"], enforce_detection=False)
+                    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                    last_faces = cascade.detectMultiScale(gray, 1.1, 4)
+                    last_emotion = result[0]['dominant_emotion']
+                    current_emotion = last_emotion
+                
+                # Draw rectangles and emotion text every frame using last known positions
+                if last_faces is not None:
+                    for (x, y, w, h) in last_faces:
+                        cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 3)
+                
+                if last_emotion:
+                    cv2.putText(frame, last_emotion, (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 3)
 
                 # Convert frame to JPEG
                 ret, buffer = cv2.imencode('.jpg', frame)
