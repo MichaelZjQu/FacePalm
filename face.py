@@ -13,7 +13,7 @@ stop_stream = Event()
 def initialize_camera():
     global cam
     if cam is None or not cam.isOpened():
-        cam = cv2.VideoCapture(0)
+        cam = cv2.VideoCapture(-1)
         if not cam.isOpened():
             raise RuntimeError("Could not initialize camera")
     return cam
