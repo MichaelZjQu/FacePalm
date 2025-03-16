@@ -84,13 +84,14 @@ body.dark-mode #modeToggle button:hover {
 #mainPage {
     display: none;
     flex-direction: column;
-    width: 100vw;
+    align-items: center;
+    width: 100%;
     height: 100vh;
-    margin: 0;
+    overflow-y: auto;
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 /* Top Bar */
@@ -205,26 +206,6 @@ body.dark-mode #loginBtn:hover {
     background-color: #666;
 }
 
-/* Placeholder */
-#placeholder {
-    width: 100vw;
-    height: calc(100vh - 70px);
-    background-color: #e0e0e0;
-    margin-top: 70px;
-    z-index: 5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 48px;
-    color: #333;
-    transition: background-color 0.3s ease;
-}
-
-body.dark-mode #placeholder {
-    background-color: #444;
-    color: #fff;
-}
-
 /* Search Frame */
 #searchFrame {
     width: 100vw;
@@ -245,12 +226,6 @@ body.dark-mode #searchFrame {
     0% { background-color: #e0e0e0; opacity: 1; }
     50% { background-color: #fff; opacity: 0.7; }
     100% { background-color: #e0e0e0; opacity: 0.5; }
-}
-
-body.dark-mode @keyframes flash {
-    0% { background-color: #444; opacity: 1; }
-    50% { background-color: #fff; opacity: 0.7; }
-    100% { background-color: #444; opacity: 0.5; }
 }
 
 @keyframes shrinkToCamera {
@@ -285,4 +260,21 @@ body.dark-mode @keyframes flash {
 
 body.dark-mode .countdown {
     color: #fff;
+}
+
+#videoFeed {
+    width: 50%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+#videoContainer {
+    margin-top: 70px;  /* Match topBar height */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

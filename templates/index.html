@@ -1,61 +1,251 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <style>
-        .container {
-            text-align: center;
-            padding: 20px;
-        }
-        button {
-            margin: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-        }
-        #aiResponse {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 5px;
-            background-color: #f0f0f0;
-            display: none;
-        }
-    </style>
+    <title>FacePalm</title>
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Stream</h1>
-        <div>
-            <img id="videoFeed" src="{{url_for('video')}}" width="50%" alt="Stream">
+    <div id="loginPage">
+        <h1>Preferences Survey</h1>
+        <form onsubmit="startApp(event)">
+            <label>What is your favourite school subject?</label><br>
+            <input type="text" name="favSubject" required><br><br>
+
+            <label>What is your least favourite school subject?</label><br>
+            <input type="text" name="notFavSubject" required><br><br>
+
+            <label>What do you do for fun?</label><br>
+            <input type="text" name="funThing" required><br><br>
+
+            <label>What do you do in your free time?</label><br>
+            <input type="text" name="freeTime" required><br><br>
+
+            <label>What frustrates you the most?</label><br>
+            <input type="text" name="frustration" required><br><br>
+            
+            <label>What scares you the most?</label><br>
+            <input type="text" name="fear" required><br><br>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <div id="mainPage" class="hidden">
+        <div id="topBar">
+            <span id="cameraIcon">FacePalm</span>
+            <span id="messageBox">Click to Analyze</span>
+            <div id="buttonContainer">
+                <button id="actionBtn" onclick="handleAction()">Go</button>
+            </div>
         </div>
-        <button id="freezeButton">Freeze Frame</button>
-        <div id="aiResponse"></div>
+        <div id="videoContainer">
+            <img id="videoFeed" src="{{ url_for('video') }}" alt="Stream">
+        </div>
+        <iframe id="searchFrame" class="hidden" frameborder="0"></iframe>
     </div>
 
     <script>
-        const freezeButton = document.getElementById('freezeButton');
-        const aiResponse = document.getElementById('aiResponse');
-        let isFrozen = false;
+        let isAnalyzed = false;
+        var userResponses = {};
 
-        // Add cleanup on page unload
-        window.addEventListener('beforeunload', async () => {
-            await fetch('/cleanup', {
-                method: 'POST',
-                keepalive: true // Ensures the request completes even if page is closing
-            });
-        });
+        window.onload = function() {
+            document.getElementById('loginPage').style.display = 'flex';
+            setLightMode(); // Default to light mode
+        };
 
-        freezeButton.addEventListener('click', async function() {
-            const response = await fetch('/toggle_freeze');
-            const data = await response.json();
-            isFrozen = data.frozen;
-            freezeButton.textContent = isFrozen ? 'Resume Stream' : 'Freeze Frame';
+        function setLightMode() {
+            document.body.classList.remove('dark-mode');
+            document.getElementById('lightModeBtn').classList.add('active');
+            document.getElementById('darkModeBtn').classList.remove('active');
+        }
+
+        function setDarkMode() {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkModeBtn').classList.add('active');
+            document.getElementById('lightModeBtn').classList.remove('active');
+        }
+
+        function startApp(event) {
+            event.preventDefault();
             
-            if (data.ai_response) {
-                aiResponse.textContent = data.ai_response;
-                aiResponse.style.display = 'block';
+            const form = event.target;
+            const formData = new FormData(form);
+
+            userResponses = {
+                favSubject: formData.get('favSubject'),
+                notFavSubject: formData.get('notFavSubject'),
+                funThing: formData.get('funThing'),
+                freeTime: formData.get('freeTime'),
+                frustration: formData.get('frustration'),
+                fear: formData.get('fear')
+            };
+            
+            fetch('/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'text/html'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Hide login page and show main page
+                    document.getElementById('loginPage').style.display = 'none';
+                    const mainPage = document.getElementById('mainPage');
+                    mainPage.classList.remove('hidden');
+                    mainPage.style.display = 'flex';
+                    
+                    // Initialize video feed
+                    const videoFeed = document.getElementById('videoFeed');
+                    videoFeed.classList.remove('hidden');
+                    videoFeed.src = `${window.location.origin}/video?t=${new Date().getTime()}`;
+                    
+                    // Store form values for later use
+                    favoriteThing = formData.get('funThing');
+                } else {
+                    alert('Error submitting form. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error submitting form. Please try again.');
+            });
+        }
+
+        function handleAction() {
+            if (isAnalyzed) {
+                resetPage();
             } else {
-                aiResponse.style.display = 'none';
+                startCountdown();
             }
-        });
+        }
+
+        function startCountdown() {
+            const videoFeed = document.getElementById('videoFeed');
+            let count = 0;
+            videoFeed.textContent = count;
+            videoFeed.classList.add('countdown');
+
+            const countdownInterval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    videoFeed.textContent = count;
+                } else {
+                    clearInterval(countdownInterval);
+                    videoFeed.textContent = '';
+                    analyzePhoto(); 
+                }
+            }, 1000); // 1 second per count
+        }
+
+        function analyzePhoto() {
+            const videoFeed = document.getElementById('videoFeed');
+            const actionBtn = document.getElementById('actionBtn');
+            const messageBox = document.getElementById('messageBox');
+            const searchFrame = document.getElementById('searchFrame');
+
+            // Show flash animation
+            videoFeed.classList.add('flash');
+
+            // Take picture from backend
+            fetch('/take_picture')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Convert image data to displayable format
+                        const imageBytes = new Uint8Array([...data.image].map(c => c.charCodeAt(0)));
+                        const blob = new Blob([imageBytes], { type: 'image/jpeg' });
+                        const imageUrl = URL.createObjectURL(blob);
+
+                        // Update UI with captured image
+                        videoFeed.src = imageUrl;
+                        videoFeed.classList.remove('flash');
+                        videoFeed.classList.add('shrink-to-camera');
+
+                        // Create search URL with actual emotion
+                        var searchterm;
+                        var searchUrl = "";
+                        switch(data.emotion){
+                            case 'happy':
+                            case 'sad':
+                            case 'fear':
+                            case 'angry':
+                                // Get AI response for emotions
+                                fetch('/get_ai_response', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        emotion: data.emotion,
+                                        responses: userResponses
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(aiData => {
+                                    searchUrl = aiData.searchterm;
+                                    continueWithSearch();
+                                });
+                                break;
+                            default:
+                                searchterm = userResponses.funThing;
+                                continueWithSearch();
+                        }
+
+                        function continueWithSearch() {
+                            console.log(searchUrl);
+                            setTimeout(() => {
+                                videoFeed.classList.add('hidden');
+                                searchFrame.src = searchUrl;
+                                searchFrame.classList.remove('hidden');
+                                messageBox.textContent = `Analyzed: ${data.emotion}`;
+                                actionBtn.textContent = 'Reset';
+                                isAnalyzed = true;
+                            }, 1600);
+                        }
+                    } else {
+                        // Handle error case
+                        videoFeed.classList.remove('flash');
+                        messageBox.textContent = 'Failed to analyze. Try again.';
+                        console.error('Failed to take picture');
+                    }
+                })
+                .catch(error => {
+                    videoFeed.classList.remove('flash');
+                    messageBox.textContent = 'Error occurred. Try again.';
+                    console.error('Error:', error);
+                });
+        }
+
+        function resetPage() {
+            const videoFeed = document.getElementById('videoFeed');
+            const searchFrame = document.getElementById('searchFrame');
+            const messageBox = document.getElementById('messageBox');
+            const actionBtn = document.getElementById('actionBtn');
+
+            // Hide search frame
+            searchFrame.classList.add('hidden');
+            videoFeed.classList.remove('shrink-to-camera');
+            videoFeed.classList.remove('hidden');
+
+            // First cleanup existing camera resources
+            fetch('/cleanup', {
+                method: 'POST'
+            }).then(() => {
+                console.log('Camera resources cleaned up');
+                
+                // Then reinitialize the video feed with a new stream
+                videoFeed.src = `${window.location.origin}/video?t=${new Date().getTime()}`;
+                
+                // Reset UI elements
+                messageBox.textContent = 'Click to Analyze';
+                actionBtn.textContent = 'Go';
+                isAnalyzed = false;
+            }).catch(error => {
+                console.error('Error during reset:', error);
+                messageBox.textContent = 'Error resetting camera. Please refresh the page.';
+            });
+        }
     </script>
 </body>
 </html>
