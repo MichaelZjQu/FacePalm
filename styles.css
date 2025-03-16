@@ -1,0 +1,288 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 16px;
+    margin: 0;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode {
+    background-color: #222;
+    color: #fff;
+}
+
+/* Login Page */
+#loginPage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: auto;
+}
+
+body.dark-mode #loginPage {
+    background-color: #333;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+#modeToggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#modeToggle button {
+    padding: 8px 16px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#modeToggle button.active {
+    background-color: #e57373;
+    color: #fff;
+    border-color: #e57373;
+}
+
+#modeToggle button:hover {
+    background-color: #ddd;
+}
+
+body.dark-mode #modeToggle button {
+    background-color: #555;
+    border-color: #555;
+    color: #fff;
+}
+
+body.dark-mode #modeToggle button.active {
+    background-color: #ef5350;
+    border-color: #ef5350;
+}
+
+body.dark-mode #modeToggle button:hover {
+    background-color: #666;
+}
+
+/* Main Page */
+#mainPage {
+    display: none;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Top Bar */
+#topBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100vw;
+    padding: 15px 20px;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+body.dark-mode #topBar {
+    background-color: #333;
+    border-bottom: 1px solid #444;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+}
+
+#cameraIcon {
+    font-size: 24px;
+    color: #666;
+}
+
+body.dark-mode #cameraIcon {
+    color: #ccc;
+}
+
+#messageBox {
+    font-size: 18px;
+    color: #333;
+    flex-grow: 1;
+    text-align: center;
+}
+
+body.dark-mode #messageBox {
+    color: #fff;
+}
+
+#buttonContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Inputs */
+input[type="text"] {
+    width: 250px;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    outline: none;
+    transition: border-color 0.2s ease, background-color 0.3s ease;
+}
+
+input[type="text"]:focus {
+    border-color: #e57373;
+}
+
+body.dark-mode input[type="text"] {
+    background-color: #444;
+    border-color: #555;
+    color: #fff;
+}
+
+/* Buttons */
+button {
+    padding: 12px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: #e57373;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: #ef5350;
+}
+
+#loginBtn {
+    background-color: #bdbdbd;
+}
+
+#loginBtn:hover {
+    background-color: #9e9e9e;
+}
+
+#actionBtn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    padding: 0;
+    font-size: 18px;
+}
+
+body.dark-mode #loginBtn {
+    background-color: #555;
+}
+
+body.dark-mode #loginBtn:hover {
+    background-color: #666;
+}
+
+/* Placeholder */
+#placeholder {
+    width: 100vw;
+    height: calc(100vh - 70px);
+    background-color: #e0e0e0;
+    margin-top: 70px;
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 48px;
+    color: #333;
+    transition: background-color 0.3s ease;
+}
+
+body.dark-mode #placeholder {
+    background-color: #444;
+    color: #fff;
+}
+
+/* Search Frame */
+#searchFrame {
+    width: 100vw;
+    height: calc(100vh - 70px);
+    border: none;
+    margin-top: 70px;
+    background-color: #fff;
+    z-index: 5;
+    transition: background-color 0.3s ease;
+}
+
+body.dark-mode #searchFrame {
+    background-color: #333;
+}
+
+/* Animations */
+@keyframes flash {
+    0% { background-color: #e0e0e0; opacity: 1; }
+    50% { background-color: #fff; opacity: 0.7; }
+    100% { background-color: #e0e0e0; opacity: 0.5; }
+}
+
+body.dark-mode @keyframes flash {
+    0% { background-color: #444; opacity: 1; }
+    50% { background-color: #fff; opacity: 0.7; }
+    100% { background-color: #444; opacity: 0.5; }
+}
+
+@keyframes shrinkToCamera {
+    0% {
+        width: 100vw;
+        height: calc(100vh - 70px);
+        margin-top: 70px;
+        margin-left: 0;
+        opacity: 0.5;
+    }
+    100% {
+        width: 24px;
+        height: 24px;
+        margin-top: 23px;
+        margin-left: 20px;
+        opacity: 0;
+    }
+}
+
+.flash {
+    animation: flash 0.6s ease-in-out;
+}
+
+.shrink-to-camera {
+    animation: shrinkToCamera 1s ease-in-out forwards;
+}
+
+.countdown {
+    font-size: 48px;
+    color: #333;
+}
+
+body.dark-mode .countdown {
+    color: #fff;
+}
